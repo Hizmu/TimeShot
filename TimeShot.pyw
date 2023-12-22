@@ -7,16 +7,25 @@ import os
 from ConfigManager import ConfigManager
 from win32com.client import Dispatch
 from datetime import datetime as dt
-
+import sys
 class TimeShot:
     def __init__(self):
         self.__config = ConfigManager()
 
-        self.win = tk.Tk()
+        self.win = tk.Tk(baseName=sys.argv[0])
         self._last_date = dt.now().date()
-
+        self.vcmd = (self.win.register(self.validate))
         self.setup_initial_ui()
+        
+    def validate(self, P):
 
+        if P.isdigit():
+            return True
+        elif P == "":
+            return False
+        else:
+            return False
+        
     def setup_initial_ui(self):
         self.win.title('TimeShot')
         self.win.minsize(400, 200)
@@ -48,7 +57,7 @@ class TimeShot:
 
     def create_ui_elements(self):
         tk.Checkbutton(self.win, text='Archive', variable=self.is_archive_var, onvalue=1, offvalue=0,
-                        command=self.is_checked_archive).place(x=5, y=60)
+                        command=self.is_checked_archive).place(x=5, y=37)
         tk.Checkbutton(self.win, text='Delete', variable=self.is_delete_var, onvalue=1, offvalue=0,
                         command=self.is_checked_delete).place(x=5, y=90)
         self.create_entry(self._screenshot_root_var, 5, 5, height=25, button_text='Screenshot Path',
@@ -80,7 +89,7 @@ class TimeShot:
         return entry
 
     def create_time_entry(self, text_variable, label_text, x, y):
-        entry = tk.Entry(self.win, textvariable=text_variable, width=3)
+        entry = tk.Entry(self.win, textvariable=text_variable, width=3,validate='all',validatecommand=(self.vcmd,'%P'))
         entry.place(x=x, y=y)
         tk.Label(self.win, text=label_text).place(x=x + 20, y=y - 2, width=10)
         return entry
